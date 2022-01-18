@@ -1,10 +1,10 @@
-# github-jira-bridge
+# github-jira-bridge
 
 Creates jira issues in reaction to certain GitHub issue event webhooks.
 
-## Use cases
+## Use cases
 
-intended users are teams that use jira internally to organise work, and also
+Intended users are teams that use jira internally to organise work, and also
 maintain open-source projects on GitHub. This is a small project built to
 scratch my own itch, but in the unlikely event other people discover this, I'm
 open to contributions. I'm also open to new name suggestions for the project.
