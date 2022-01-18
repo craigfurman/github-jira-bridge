@@ -44,10 +44,35 @@ func handleGithubIssueEvent(w http.ResponseWriter, issue *github.IssuesEvent) {
 	logger.Printf("GitHub issue #%d was %s, will do nothing\n", *issue.Issue.Number, *issue.Action)
 }
 
-// TODO make idempotent
 func ensureGithubIssueHasLinkedJiraIssue(w http.ResponseWriter, issue *github.IssuesEvent) {
+	signature := "Created by github-jira-bridge."
+	jqlFindPotentiallyLinkedIssues := fmt.Sprintf(
+		`project = %s AND labels = %s AND text ~ "%s\n" AND text ~ "%s"`,
+		jiraProjectKey, jiraLabelForLinkedGitHubIssue, *issue.Issue.HTMLURL, signature,
+	)
+	potentiallyLinkedJiraIssues, resp, err := jiraClient.Issue.Search(jqlFindPotentiallyLinkedIssues, nil)
+	if err != nil {
+		var jiraRespBody []byte
+		if resp != nil {
+			defer resp.Body.Close()
+			jiraRespBody, _ = io.ReadAll(resp.Body)
+		}
+		logger.Printf("error searching for jira issues: %s: %s\n", err, string(jiraRespBody))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if len(potentiallyLinkedJiraIssues) == 1 {
+		logger.Printf("found jira issue %s that is linked to GitHub issue #%d, will do nothing\n", potentiallyLinkedJiraIssues[0].Key, *issue.Issue.Number)
+		return
+	}
+	if len(potentiallyLinkedJiraIssues) > 1 {
+		logger.Printf("found %d jira issues that are linked to GitHub issue #%d, will do nothing, but this is very unexpected\n", len(potentiallyLinkedJiraIssues), *issue.Issue.Number)
+		return
+	}
+
 	logger.Printf("creating jira issue for GitHub issue #%d\n", *issue.Issue.Number)
-	jiraIssueBody := fmt.Sprintf("%s\n\nCreated by github-jira-bridge.", *issue.Issue.HTMLURL)
+	jiraIssueBody := fmt.Sprintf("%s\n\n%s", *issue.Issue.HTMLURL, signature)
 	jiraIssue := &jira.Issue{
 		Fields: &jira.IssueFields{
 			Summary:     *issue.Issue.Title,
@@ -57,7 +82,7 @@ func ensureGithubIssueHasLinkedJiraIssue(w http.ResponseWriter, issue *github.Is
 			Project:     jira.Project{Key: jiraProjectKey},
 		},
 	}
-	_, resp, err := jiraClient.Issue.Create(jiraIssue)
+	_, resp, err = jiraClient.Issue.Create(jiraIssue)
 	if err != nil {
 		var jiraRespBody []byte
 		if resp != nil {
