@@ -56,7 +56,9 @@ gcloud functions deploy GitHubJiraBridge --runtime go116 --trigger-http
 Configure all of the environment variables found in [`config.go`](./config.go),
 according to your particular jira/github projects.
 
-
+Configure a github webhook for issues events, with the URL set to
+`${CLOUD_FUNCTION_BASE_URL}/github`. Generate a random webhook secret and
+configure this in both the webhook, and the relevent environment variable.
 
 ## Contributing
 
