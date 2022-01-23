@@ -45,10 +45,9 @@ func handleGithubIssueEvent(w http.ResponseWriter, issue *github.IssuesEvent) {
 }
 
 func ensureGithubIssueHasLinkedJiraIssue(w http.ResponseWriter, issue *github.IssuesEvent) {
-	signature := "Created by github-jira-bridge."
 	jqlFindPotentiallyLinkedIssues := fmt.Sprintf(
 		`project = %s AND labels = %s AND text ~ "%s\n" AND text ~ "%s"`,
-		jiraProjectKey, jiraLabelForLinkedGitHubIssue, *issue.Issue.HTMLURL, signature,
+		jiraProjectKey, jiraLabelForLinkedGitHubIssue, *issue.Issue.HTMLURL, jiraStubSignature,
 	)
 	potentiallyLinkedJiraIssues, resp, err := jiraClient.Issue.Search(jqlFindPotentiallyLinkedIssues, nil)
 	if err != nil {
@@ -72,7 +71,7 @@ func ensureGithubIssueHasLinkedJiraIssue(w http.ResponseWriter, issue *github.Is
 	}
 
 	logger.Printf("creating jira issue for GitHub issue #%d\n", *issue.Issue.Number)
-	jiraIssueBody := fmt.Sprintf("%s\n\n%s", *issue.Issue.HTMLURL, signature)
+	jiraIssueBody := fmt.Sprintf("%s\n\n%s", *issue.Issue.HTMLURL, jiraStubSignature)
 	jiraIssue := &jira.Issue{
 		Fields: &jira.IssueFields{
 			Summary:     *issue.Issue.Title,

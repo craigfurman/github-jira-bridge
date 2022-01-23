@@ -24,11 +24,8 @@ To support this, this project has the following features:
 
 1. In response to a triage label being applied to a GitHub issue, create a
    linked stub jira issue.
-1. **Coming soon**: In response to a jira issue being scheduled (having its
-   state changed from icebox/backlog to the ToDo column of a board, for
-   example), change a status label on a linked GitHub issue.
-1. **Coming soon**: In response to a jira issue being started (e.g. moving from
-   ToDo to in-progress), change a status label on a linked GitHub issue.
+1. In response to a jira issue's state changing, change a mutually exclusive
+   status label on a linked GitHub issue.
 1. **Coming soon**: In response to a GitHub issue being closed, change a linked
    jira issue's status to done.
 
@@ -56,9 +53,16 @@ gcloud functions deploy GitHubJiraBridge --runtime go116 --trigger-http
 Configure all of the environment variables found in [`config.go`](./config.go),
 according to your particular jira/github projects.
 
+
+
 Configure a github webhook for issues events, with the URL set to
 `${CLOUD_FUNCTION_BASE_URL}/github`. Generate a random webhook secret and
 configure this in both the webhook, and the relevent environment variable.
+
+Configure a jira webhook for issues events, with the URL set to
+`${CLOUD_FUNCTION_BASE_URL}/jira?token=abcd`. Set the JQL filter to `labels =
+from-github`. Generate a random webhook secret and configure this in both the
+token query parameter, and the relevent environment variable.
 
 ## Contributing
 
