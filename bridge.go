@@ -52,6 +52,9 @@ func init() {
 
 	jiraStatusToGithubLabels = map[string]string{}
 	for _, pair := range strings.Split(jiraStatusChangeToGithubLabels, ",") {
+		if pair == "" {
+			continue
+		}
 		jiraStatusAndGithubLabel := strings.Split(pair, ":")
 		jiraStatusToGithubLabels[jiraStatusAndGithubLabel[0]] = jiraStatusAndGithubLabel[1]
 	}
