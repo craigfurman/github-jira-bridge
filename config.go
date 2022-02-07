@@ -13,8 +13,9 @@ var (
 	// Must have repo scope
 	githubToken = os.Getenv("GITHUB_API_TOKEN")
 
-	githubWebhookSecret = os.Getenv("GITHUB_WEBHOOK_SECRET")
-	githubTriageLabel   = os.Getenv("GITHUB_TRIAGE_LABEL")
+	githubWebhookSecret   = os.Getenv("GITHUB_WEBHOOK_SECRET")
+	githubTriageLabel     = os.Getenv("GITHUB_TRIAGE_LABEL")
+	triagedIssueJiraLabel = os.Getenv("TRIAGED_ISSUE_JIRA_LABEL")
 
 	// Format: jiraStatus1:githubLabel1,jiraStatus2:githubLabel2
 	// Example: "To Do:status/todo,In Progress:status/in-progress"

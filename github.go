@@ -76,7 +76,7 @@ func ensureGithubIssueHasLinkedJiraIssue(w http.ResponseWriter, issue *github.Is
 		Fields: &jira.IssueFields{
 			Summary:     *issue.Issue.Title,
 			Description: jiraIssueBody,
-			Labels:      []string{jiraLabelForLinkedGitHubIssue},
+			Labels:      []string{jiraLabelForLinkedGitHubIssue, triagedIssueJiraLabel},
 			Type:        jira.IssueType{Name: jiraIssueType},
 			Project:     jira.Project{Key: jiraProjectKey},
 		},
